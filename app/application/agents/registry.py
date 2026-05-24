@@ -1,5 +1,6 @@
 """Multi-agent registry — routes requests to specialized agents."""
 
+from app.application.permissions.service import PermissionService
 from app.application.tools.service import ToolRegistryService
 from app.core.config import settings
 from app.core.logging import get_logger
@@ -10,10 +11,17 @@ logger = get_logger(__name__)
 
 
 class AgentRegistry:
-    def __init__(self, tool_registry_service: ToolRegistryService | None = None) -> None:
+    def __init__(
+        self,
+        tool_registry_service: ToolRegistryService | None = None,
+        permission_service: PermissionService | None = None,
+    ) -> None:
         self._definitions: dict[str, AgentDefinition] = {}
         self._tool_service = tool_registry_service or ToolRegistryService()
-        self._default_orchestrator = LangGraphOrchestratorAgent(self._tool_service)
+        self._permission_service = permission_service
+        self._default_orchestrator = LangGraphOrchestratorAgent(
+            self._tool_service, permission_service
+        )
         self._register_defaults()
 
     def _register_defaults(self) -> None:

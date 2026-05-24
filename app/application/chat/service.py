@@ -6,6 +6,7 @@ from app.application.permissions.service import PermissionService
 from app.application.ports import AgentPort
 from app.core.logging import AuditAction, audit_log, get_logger
 from app.core.observability.metrics import increment_counter
+from app.domain.auth.models import UserContext
 from app.domain.chat.models import (
     ChatRequest,
     ChatResponse,
@@ -24,8 +25,14 @@ class ChatService:
         self._permissions = permission_service
         self._agent = agent
 
-    async def process_message(self, request: ChatRequest, token: str) -> ChatResponse:
-        user = await self._permissions.resolve_user_context(token)
+    async def process_message(
+        self,
+        request: ChatRequest,
+        token: str,
+        user: UserContext | None = None,
+    ) -> ChatResponse:
+        if user is None:
+            user = await self._permissions.resolve_user_context(token)
         conversation_id = request.conversation_id or new_conversation_id()
 
         audit_log(

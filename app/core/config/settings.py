@@ -96,7 +96,13 @@ class Settings(BaseSettings):
     customer_service_url: str = Field(default="http://localhost:8003", alias="CUSTOMER_SERVICE_URL")
 
     # Agents
-    agent_max_iterations: int = Field(default=10, alias="AGENT_MAX_ITERATIONS")
+    agent_max_iterations: int = Field(default=8, alias="AGENT_MAX_ITERATIONS")
+    agent_max_tool_calls: int = Field(default=5, alias="AGENT_MAX_TOOL_CALLS")
+    agent_temperature: float = Field(default=0.0, alias="AGENT_TEMPERATURE")
+    agent_top_p: float = Field(default=1.0, alias="AGENT_TOP_P")
+    agent_seed: int | None = Field(default=42, alias="AGENT_SEED")
+    agent_prompt_template: str = Field(default="orchestrator", alias="AGENT_PROMPT_TEMPLATE")
+    agent_memory_enabled: bool = Field(default=False, alias="AGENT_MEMORY_ENABLED")
     agent_verbose: bool = Field(default=False, alias="AGENT_VERBOSE")
     default_agent_id: str = Field(default="orchestrator", alias="DEFAULT_AGENT_ID")
 

@@ -5,6 +5,7 @@ from fastapi import Depends, Header, HTTPException, Request, status
 from app.application.chat.service import ChatService
 from app.application.permissions.service import PermissionService
 from app.bootstrap.container import AppContainer, get_container
+from app.domain.auth.models import UserContext
 
 
 def get_app_container(request: Request) -> AppContainer:
@@ -21,7 +22,24 @@ def get_permission_service(
     return container.permission_service()
 
 
-async def get_auth_token(authorization: str | None = Header(default=None)) -> str:
+async def get_auth_token(request: Request) -> str:
+    """Return token from middleware state or Authorization header."""
+    if token := getattr(request.state, "token", None):
+        return token
+    return await _parse_auth_header(request.headers.get("Authorization"))
+
+
+async def get_current_user(request: Request) -> UserContext:
+    """Return UserContext attached by IAMAuthMiddleware."""
+    user = getattr(request.state, "user", None)
+    if user is not None:
+        return user
+    token = await get_auth_token(request)
+    container = get_app_container(request)
+    return await container.permission_service().resolve_user_context(token)
+
+
+async def _parse_auth_header(authorization: str | None) -> str:
     if not authorization:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

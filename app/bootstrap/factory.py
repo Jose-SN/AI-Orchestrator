@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.bootstrap.lifespan import lifespan
 from app.core.config import settings
 from app.presentation.http.middleware.error_handler import register_exception_handlers
+from app.presentation.http.middleware.iam_auth import IAMAuthMiddleware
 from app.presentation.http.middleware.logging import LoggingMiddleware
 from app.presentation.http.middleware.request_id import RequestIDMiddleware
 from app.presentation.http.v1.router import api_v1_router
@@ -30,6 +31,7 @@ def create_app() -> FastAPI:
     )
     app.add_middleware(LoggingMiddleware)
     app.add_middleware(RequestIDMiddleware)
+    app.add_middleware(IAMAuthMiddleware)
 
     register_exception_handlers(app)
     app.include_router(api_v1_router)

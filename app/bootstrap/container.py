@@ -7,7 +7,7 @@ from app.application.chat.service import ChatService
 from app.application.permissions.service import PermissionService
 from app.application.tools.service import ToolRegistryService
 from app.core.config import Settings, get_settings
-from app.infrastructure.http.clients.iam import IAMClient
+from app.infrastructure.iam.client import IAMClient
 from app.infrastructure.http.clients.microservices import MicroserviceClientFactory
 from app.infrastructure.vector.factory import create_vector_store
 
@@ -45,7 +45,10 @@ class AppContainer:
 
     def agent_registry(self) -> AgentRegistry:
         if self._agent_registry is None:
-            self._agent_registry = AgentRegistry(self.tool_registry_service())
+            self._agent_registry = AgentRegistry(
+                self.tool_registry_service(),
+                self.permission_service(),
+            )
         return self._agent_registry
 
     def permission_service(self) -> PermissionService:
