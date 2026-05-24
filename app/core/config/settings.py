@@ -85,6 +85,10 @@ class Settings(BaseSettings):
         alias="IAM_VALIDATE_TOKEN_PATH",
     )
     iam_timeout_seconds: int = Field(default=10, alias="IAM_TIMEOUT_SECONDS")
+    iam_cache_ttl_seconds: int = Field(default=300, alias="IAM_CACHE_TTL_SECONDS")
+    iam_retry_attempts: int = Field(default=3, alias="IAM_RETRY_ATTEMPTS")
+    iam_modules_path: str = Field(default="/api/v1/auth/modules", alias="IAM_MODULES_PATH")
+    iam_actions_path: str = Field(default="/api/v1/auth/actions", alias="IAM_ACTIONS_PATH")
 
     # Microservices
     user_service_url: str = Field(default="http://localhost:8001", alias="USER_SERVICE_URL")
