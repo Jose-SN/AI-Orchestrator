@@ -132,3 +132,59 @@ Key settings:
 ```bash
 pytest tests/ -v
 ```
+
+
+AI-Orchestrator/
+├── app/
+│   ├── main.py                          # Thin entry point
+│   │
+│   ├── bootstrap/                       # Composition root
+│   │   ├── container.py                 # DI container (AppContainer)
+│   │   ├── factory.py                   # create_app()
+│   │   └── lifespan.py                  # Startup/shutdown hooks
+│   │
+│   ├── core/                            # Cross-cutting concerns
+│   │   ├── config/                      # Pydantic settings
+│   │   ├── logging/                     # Structlog + audit logger
+│   │   ├── observability/               # Metrics, tracing, correlation IDs
+│   │   └── exceptions/                  # Error hierarchy
+│   │
+│   ├── domain/                          # Pure business models (no infra deps)
+│   │   ├── chat/                        # ChatRequest, ChatResponse, etc.
+│   │   ├── auth/                        # UserContext, permissions
+│   │   ├── tools/                       # ToolDefinition, snapshots
+│   │   ├── agents/                      # AgentDefinition, AgentType
+│   │   └── prompts/                     # System prompts per agent/channel
+│   │
+│   ├── application/                     # Use cases (orchestration logic)
+│   │   ├── ports/                       # Interfaces (LLM, Agent, VectorStore, Audit)
+│   │   ├── chat/                        # ChatService
+│   │   ├── permissions/                 # PermissionService
+│   │   └── agents/                      # AgentRegistry (multi-agent routing)
+│   │
+│   ├── infrastructure/                  # External adapters
+│   │   ├── http/clients/                # IAM, User, Module HTTP clients
+│   │   ├── llm/providers/               # Ollama, OpenAI
+│   │   ├── agents/
+│   │   │   ├── langgraph/               # Current ReAct agent
+│   │   │   └── multi/                   # Supervisor agent (future)
+│   │   ├── tools/
+│   │   │   ├── registry.py              # Permission-aware tool registry
+│   │   │   └── definitions/             # Tool implementations
+│   │   ├── vector/                      # NoOp, Qdrant (future RAG)
+│   │   └── channels/
+│   │       ├── whatsapp/                # WhatsApp adapter
+│   │       └── websocket/               # WebSocket handler
+│   │
+│   └── presentation/                    # Delivery mechanisms
+│       ├── http/
+│       │   ├── dependencies/            # FastAPI DI from container
+│       │   ├── middleware/              # Logging, tracing, errors
+│       │   └── v1/endpoints/            # REST API routes
+│       └── websocket/                   # WebSocket routes (future)
+│
+└── tests/
+    ├── unit/                            # Fast, isolated tests
+    ├── integration/                     # (ready for HTTP/IAM mocks)
+    ├── e2e/                             # (ready for full flow tests)
+    └── fixtures/                        # DI container, mocks

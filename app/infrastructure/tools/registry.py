@@ -7,7 +7,7 @@ from langchain_core.tools import StructuredTool
 from pydantic import BaseModel
 
 from app.core.logging import get_logger
-from app.domain.models.tool import ToolDefinition, ToolRegistrySnapshot
+from app.domain.tools.models import ToolDefinition, ToolRegistrySnapshot
 
 logger = get_logger(__name__)
 

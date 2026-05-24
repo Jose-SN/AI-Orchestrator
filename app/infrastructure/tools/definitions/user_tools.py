@@ -5,7 +5,7 @@ import json
 from pydantic import BaseModel, Field
 
 from app.core.logging import get_logger
-from app.infrastructure.http.microservice_client import UserServiceClient
+from app.infrastructure.http.clients.microservices import UserServiceClient
 from app.infrastructure.tools.registry import register_tool
 
 logger = get_logger(__name__)

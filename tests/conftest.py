@@ -5,6 +5,8 @@ from httpx import ASGITransport, AsyncClient
 
 from app.main import app
 
+pytest_plugins = ["tests.fixtures.container"]
+
 
 @pytest.fixture
 async def client():
