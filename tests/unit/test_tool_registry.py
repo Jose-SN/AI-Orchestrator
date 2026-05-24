@@ -13,7 +13,10 @@ def _load_tools():
 
 def test_tools_registered():
     definitions = tool_registry.get_all_definitions()
-    assert len(definitions) >= 4
+    assert len(definitions) >= 10
+    names = {d.name for d in definitions}
+    assert "create_customer" in names
+    assert "search_customers" in names
 
 
 def test_permission_filtering():

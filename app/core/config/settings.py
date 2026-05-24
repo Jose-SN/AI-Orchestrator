@@ -89,6 +89,7 @@ class Settings(BaseSettings):
     # Microservices
     user_service_url: str = Field(default="http://localhost:8001", alias="USER_SERVICE_URL")
     module_service_url: str = Field(default="http://localhost:8002", alias="MODULE_SERVICE_URL")
+    customer_service_url: str = Field(default="http://localhost:8003", alias="CUSTOMER_SERVICE_URL")
 
     # Agents
     agent_max_iterations: int = Field(default=10, alias="AGENT_MAX_ITERATIONS")

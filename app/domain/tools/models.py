@@ -1,9 +1,18 @@
-"""Tool bounded context — tool metadata models."""
+"""Tool domain models."""
 
 from collections.abc import Awaitable, Callable
-from typing import Any
+from enum import Enum
 
 from pydantic import BaseModel, Field
+
+
+class ToolOperation(str, Enum):
+    CREATE = "create"
+    UPDATE = "update"
+    DELETE = "delete"
+    SEARCH = "search"
+    LIST = "list"
+    GET = "get"
 
 
 class ToolDefinition(BaseModel):
@@ -12,6 +21,7 @@ class ToolDefinition(BaseModel):
     required_permissions: list[str] = Field(default_factory=list)
     service: str
     category: str = "general"
+    operation: ToolOperation = ToolOperation.GET
     enabled: bool = True
     args_schema: type[BaseModel] | None = Field(default=None, exclude=True)
     handler: Callable[..., Awaitable[str]] | None = Field(default=None, exclude=True)
@@ -29,3 +39,5 @@ class ToolRegistrySnapshot(BaseModel):
     allowed_count: int
     allowed_tools: list[str]
     denied_tools: list[str] = Field(default_factory=list)
+    tools_by_operation: dict[str, list[str]] = Field(default_factory=dict)
+    tools_by_category: dict[str, list[str]] = Field(default_factory=dict)

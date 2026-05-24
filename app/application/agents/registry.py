@@ -1,5 +1,6 @@
 """Multi-agent registry — routes requests to specialized agents."""
 
+from app.application.tools.service import ToolRegistryService
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.domain.agents.models import AgentDefinition, AgentType
@@ -9,11 +10,10 @@ logger = get_logger(__name__)
 
 
 class AgentRegistry:
-    """Central registry for agent definitions and runtime resolution."""
-
-    def __init__(self) -> None:
+    def __init__(self, tool_registry_service: ToolRegistryService | None = None) -> None:
         self._definitions: dict[str, AgentDefinition] = {}
-        self._default_orchestrator = LangGraphOrchestratorAgent()
+        self._tool_service = tool_registry_service or ToolRegistryService()
+        self._default_orchestrator = LangGraphOrchestratorAgent(self._tool_service)
         self._register_defaults()
 
     def _register_defaults(self) -> None:

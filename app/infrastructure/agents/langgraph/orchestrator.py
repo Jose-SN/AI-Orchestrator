@@ -5,22 +5,22 @@ from typing import Any
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langgraph.prebuilt import create_react_agent
 
+from app.application.tools.service import ToolRegistryService
 from app.core.config import settings
 from app.core.exceptions import AgentExecutionError
 from app.core.logging import get_logger
+from app.core.observability.context import get_trace_id
 from app.domain.auth.models import UserContext
 from app.domain.prompts.system import ORCHESTRATOR_SYSTEM_PROMPT
 from app.infrastructure.llm.factory import create_llm_provider
-from app.infrastructure.tools.registry import tool_registry
 
 logger = get_logger(__name__)
 
 
 class LangGraphOrchestratorAgent:
-    """LangChain ReAct agent — never accesses databases, only HTTP tools."""
-
-    def __init__(self) -> None:
+    def __init__(self, tool_registry_service: ToolRegistryService | None = None) -> None:
         self._llm_provider = create_llm_provider()
+        self._tool_service = tool_registry_service or ToolRegistryService()
 
     @property
     def provider_name(self) -> str:
@@ -34,8 +34,11 @@ class LangGraphOrchestratorAgent:
         token: str,
         conversation_id: str,
     ) -> dict[str, Any]:
-        tools = tool_registry.to_langchain_tools(
-            user.permissions, token=token, user_id=user.user_id
+        tools = self._tool_service.load_langchain_tools(
+            user,
+            token=token,
+            trace_id=get_trace_id(),
+            conversation_id=conversation_id,
         )
 
         if not tools:

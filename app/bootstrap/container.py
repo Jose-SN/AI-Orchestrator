@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from app.application.agents.registry import AgentRegistry
 from app.application.chat.service import ChatService
 from app.application.permissions.service import PermissionService
+from app.application.tools.service import ToolRegistryService
 from app.core.config import Settings, get_settings
 from app.infrastructure.http.clients.iam import IAMClient
 from app.infrastructure.http.clients.microservices import MicroserviceClientFactory
@@ -22,6 +23,7 @@ class AppContainer:
     settings: Settings = field(default_factory=get_settings)
     _iam_client: IAMClient | None = field(default=None, init=False, repr=False)
     _microservices: MicroserviceClientFactory | None = field(default=None, init=False, repr=False)
+    _tool_registry_service: ToolRegistryService | None = field(default=None, init=False, repr=False)
     _agent_registry: AgentRegistry | None = field(default=None, init=False, repr=False)
     _permission_service: PermissionService | None = field(default=None, init=False, repr=False)
     _chat_service: ChatService | None = field(default=None, init=False, repr=False)
@@ -36,14 +38,22 @@ class AppContainer:
             self._microservices = MicroserviceClientFactory()
         return self._microservices
 
+    def tool_registry_service(self) -> ToolRegistryService:
+        if self._tool_registry_service is None:
+            self._tool_registry_service = ToolRegistryService()
+        return self._tool_registry_service
+
     def agent_registry(self) -> AgentRegistry:
         if self._agent_registry is None:
-            self._agent_registry = AgentRegistry()
+            self._agent_registry = AgentRegistry(self.tool_registry_service())
         return self._agent_registry
 
     def permission_service(self) -> PermissionService:
         if self._permission_service is None:
-            self._permission_service = PermissionService(self.iam_client())
+            self._permission_service = PermissionService(
+                self.iam_client(),
+                self.tool_registry_service(),
+            )
         return self._permission_service
 
     def chat_service(self) -> ChatService:

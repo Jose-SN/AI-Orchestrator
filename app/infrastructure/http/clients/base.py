@@ -72,3 +72,9 @@ class BaseHTTPClient:
 
     async def post(self, path: str, *, token: str | None = None, json: dict[str, Any] | None = None) -> dict[str, Any]:
         return await self.request("POST", path, token=token, json=json)
+
+    async def put(self, path: str, *, token: str | None = None, json: dict[str, Any] | None = None) -> dict[str, Any]:
+        return await self.request("PUT", path, token=token, json=json)
+
+    async def delete(self, path: str, *, token: str | None = None) -> dict[str, Any]:
+        return await self.request("DELETE", path, token=token)
